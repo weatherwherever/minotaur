@@ -43,12 +43,12 @@ var mvLoc;
 var board;
 // Hn�tar veggsins
 var vertices = [
-    vec4(-5.0, 0.0, 0.0, 1.0),
-    vec4(5.0, 0.0, 0.0, 1.0),
-    vec4(5.0, 1.0, 0.0, 1.0),
-    vec4(5.0, 1.0, 0.0, 1.0),
-    vec4(-5.0, 1.0, 0.0, 1.0),
-    vec4(-5.0, 0.0, 0.0, 1.0),
+    vec4(-3.0, 0.0, 0.0, 1.0),
+    vec4(3.0, 0.0, 0.0, 1.0),
+    vec4(3.0, 1.0, 0.0, 1.0),
+    vec4(3.0, 1.0, 0.0, 1.0),
+    vec4(-3.0, 1.0, 0.0, 1.0),
+    vec4(-3.0, 0.0, 0.0, 1.0),
     // Hn�tar g�lfsins (strax � eftir)
     vec4(-5.0, 0.0, 10.0, 1.0),
     vec4(5.0, 0.0, 10.0, 1.0),
@@ -230,7 +230,7 @@ var render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
-    var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
+    var mv = lookAt(vec3(userXPos, 50, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     var mv1 = mv;
