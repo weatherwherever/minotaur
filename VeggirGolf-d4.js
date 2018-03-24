@@ -230,14 +230,14 @@ var render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
-    var mv = lookAt(vec3(userXPos, 50, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
+    var mv = lookAt(vec3(userXPos,70, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     var mv1 = mv;
 
-    // Teikna g�lf me� mynstri
-    gl.bindTexture(gl.TEXTURE_2D, texGolf);
-    gl.drawArrays(gl.TRIANGLES, numVertices, numVertices);
+    // Teikna g�lf me� mynstri/*
+    /*gl.bindTexture(gl.TEXTURE_2D, texGolf);
+    gl.drawArrays(gl.TRIANGLES, numVertices, numVertices);*/
     /*
     // Teikna loft me� mynstri
     gl.bindTexture( gl.TEXTURE_2D, texLoft );
