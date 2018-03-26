@@ -16,11 +16,11 @@ varying vec2 fTexCoord;
 uniform mat4 projection;
 uniform mat4 modelview;
 
-void main()
+void main() 
 {
     fTexCoord = vTexCoord;
     gl_Position = projection * modelview * vPosition;
-}
+} 
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
@@ -44,7 +44,6 @@ main()
 <script type="text/javascript" src="../Common/webgl-utils.js"></script>
 <script type="text/javascript" src="../Common/initShaders.js"></script>
 <script type="text/javascript" src="../Common/MV.js"></script>
-<script type="text/javascript" src="PlyReader.js"></script>
 <script type="text/javascript" src="VeggirGolf-d4.js"></script>
 
 
