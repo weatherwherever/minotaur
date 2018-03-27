@@ -237,13 +237,7 @@ var render = function () {
 
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
     var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
-
-    console.info(mv);
     
-    console.info({
-        xPos: userXPos,
-        zPos: userZPos
-    });
 
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     var mv1 = mv;
@@ -265,8 +259,43 @@ var render = function () {
 
     gl.bindTexture(gl.TEXTURE_2D, texVegg);
 
+    var wallsCollision = [];
+    
+    var spaceZ = 0;
+    for (let i = 0; i < board.length; i++) {
+        var spaceX = 0;
+        for (let j = 0; j < board[i].length; j++) {
+            if (board[i][j] === '-') {
+                wallsCollision.push({ x: spaceX, z: spaceZ});
+            } else if (board[i][j] === '|') {
+                wallsCollision.push({ x: spaceX, z: spaceZ});
+            }
+            spaceX += 3;
+        }
+        spaceX = 0;
+        spaceZ += 3;
+    }
 
+    for (let i = 0; i < wallsCollision.length; i++) {
+        //wwwwwwconsole.info(wallsCollision[i].x);
 
+        
+        if(wallsCollision[i].x - 3.1  < userXPos && wallsCollision[i].x + 3.1  > userXPos) {
+            if(wallsCollision[i].z - 3.1 < userZPos && wallsCollision[i].z + 3.1 > userZPos){
+        
+            }
+        }
+
+    }
+
+/*
+    console.info({
+        xPos: userXPos,
+        wallsCollisionX: wallsCollision[0].x,
+        zPos: userZPos,
+        wallsCollisionZ: wallsCollision[0].z,
+    });
+    */
 
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
