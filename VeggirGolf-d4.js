@@ -24,6 +24,13 @@ var texLoft;
 // Breytur fyrir hreyfingu �horfanda
 var userXPos = 3.0; // Initial position of user
 var userZPos = 6.0; //   in (x, z) coordinates, y is fixed
+
+
+/* for collision */
+var userprevX = 3.0;
+var userprevZ = 6.0;
+
+
 var userIncr = 0.1; // Size of forward/backward step
 var userAngle = 270.0; // Direction of the user in degrees
 var userXDir = 0.0; // X-coordinate of heading
@@ -242,15 +249,21 @@ var render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     var wallsCollision = [];
-    
+
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
         var spaceX = 0;
         for (let j = 0; j < board[i].length; j++) {
             if (board[i][j] === '-') {
-                wallsCollision.push({ x: spaceX, z: spaceZ});
+                wallsCollision.push({
+                    x: spaceX,
+                    z: spaceZ
+                });
             } else if (board[i][j] === '|') {
-                wallsCollision.push({ x: spaceX, z: spaceZ});
+                wallsCollision.push({
+                    x: spaceX,
+                    z: spaceZ
+                });
             }
             spaceX += 3;
         }
@@ -258,32 +271,27 @@ var render = function () {
         spaceZ += 3;
     }
 
+    /* collison */
+
     for (let i = 0; i < wallsCollision.length; i++) {
-        //wwwwwwconsole.info(wallsCollision[i].x);
 
-        
-        if(wallsCollision[i].x - 2.1  < userXPos && wallsCollision[i].x + 2.1  > userXPos && Math.floor(wallsCollision[i].z) === Math.floor(userZPos)) {
-
-            console.info(direction);
-            userZPos += 0.5
+        if (Math.floor(userXPos) > wallsCollision[i].x - 3 && Math.floor(userXPos) < wallsCollision[i].x + 3 && Math.floor(userZPos) === wallsCollision[i].z ) {
+            
+            if(userprevZ > userZPos) {
+                userZDir = 0;
+            } else {
+                userZDir = 0;
+            }
         }
 
-        if(wallsCollision[i].z - 2.1  < userZPos && wallsCollision[i].z + 2.1  > userZPos && Math.floor(wallsCollision[i].x) === Math.floor(userXPos)) {
-            userXPos += 0.5
-        }
+        //Math.floor(userZPos) > wallsCollision[i].z - 3 && Math.floor(userZPos) < wallsCollision[i].z + 3 && Math.floor(userXPos) === wallsCollision[i].x
 
-    }/*
-    console.info({
-        xPos: userXPos,
-        wallsCollisionX: wallsCollision[0].x,
-        zPos: userZPos,
-        wallsCollisionZ: wallsCollision[0].z,
-    });*/
-    
+    }
+
 
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
     var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
-    
+
 
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     var mv1 = mv;
@@ -326,10 +334,7 @@ var render = function () {
                 gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
                 gl.drawArrays(gl.TRIANGLES, 0, numVertices);
             }
-
             spaceX += 3;
-            0
-
         }
 
         spaceX = 0;
@@ -339,5 +344,7 @@ var render = function () {
     }
 
 
+    userprevX = userXPos;
+    userprevZ = userZPos; 
     requestAnimFrame(render);
 }
