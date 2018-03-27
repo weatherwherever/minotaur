@@ -77,6 +77,10 @@ var texCoords = [
 
 
 window.onload = function init() {
+    /* mini map fyrir leik */
+
+
+    /*************************************** */
 
     canvas = document.getElementById("gl-canvas");
 
@@ -201,6 +205,7 @@ window.onload = function init() {
 
     // Event listener for keyboard
     window.addEventListener("keydown", function (e) {
+
         switch (e.keyCode) {
             case 87: // w
                 userXPos += userIncr * userXDir;
@@ -219,6 +224,7 @@ window.onload = function init() {
                 userZPos += userIncr * userXDir;;
                 break;
         }
+
     });
 
     render();
@@ -230,9 +236,14 @@ var render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
-    var mv = lookAt(vec3(userXPos,0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
+    var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
-    /*console.info({xPos: userXPos, zPos: userZPos});*/
+    console.info(mv);
+    
+    console.info({
+        xPos: userXPos,
+        zPos: userZPos
+    });
 
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     var mv1 = mv;
@@ -264,11 +275,13 @@ var render = function () {
         for (let j = 0; j < board[i].length; j++) {
 
             if (board[i][j] === '-') {
+                /* main leikur */
                 mv = mv1;
                 mv = mult(mv, translate(spaceX, 0.0, spaceZ));
                 gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
                 gl.drawArrays(gl.TRIANGLES, 0, numVertices);
-            } else if(board[i][j] === '|'){
+            } else if (board[i][j] === '|') {
+                /* main leikur */
                 mv = mv1;
                 mv = mult(mv, translate(spaceX, 0.0, spaceZ));
                 mv = mult(mv, rotateY(90.0));
@@ -277,7 +290,7 @@ var render = function () {
             }
 
             spaceX += 3;
-            
+            0
 
         }
 
