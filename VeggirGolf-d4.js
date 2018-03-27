@@ -41,6 +41,8 @@ var mvLoc;
 
 /* board */
 var board;
+
+var direction = '';
 // Hn�tar veggsins
 var vertices = [
     vec4(-3.0, 0.0, 0.0, 1.0),
@@ -209,19 +211,23 @@ window.onload = function init() {
         switch (e.keyCode) {
             case 87: // w
                 userXPos += userIncr * userXDir;
-                userZPos += userIncr * userZDir;;
+                userZPos += userIncr * userZDir;
+                direction = 'forward';
                 break;
             case 83: // s
                 userXPos -= userIncr * userXDir;
-                userZPos -= userIncr * userZDir;;
+                userZPos -= userIncr * userZDir;
+                direction = 'back';
                 break;
             case 65: // a
                 userXPos += userIncr * userZDir;
-                userZPos -= userIncr * userXDir;;
+                userZPos -= userIncr * userXDir;
+                direction = 'left';
                 break;
             case 68: // d
                 userXPos -= userIncr * userZDir;
-                userZPos += userIncr * userXDir;;
+                userZPos += userIncr * userXDir;
+                direction = 'right';
                 break;
         }
 
@@ -234,6 +240,46 @@ window.onload = function init() {
 
 var render = function () {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    var wallsCollision = [];
+    
+    var spaceZ = 0;
+    for (let i = 0; i < board.length; i++) {
+        var spaceX = 0;
+        for (let j = 0; j < board[i].length; j++) {
+            if (board[i][j] === '-') {
+                wallsCollision.push({ x: spaceX, z: spaceZ});
+            } else if (board[i][j] === '|') {
+                wallsCollision.push({ x: spaceX, z: spaceZ});
+            }
+            spaceX += 3;
+        }
+        spaceX = 0;
+        spaceZ += 3;
+    }
+
+    for (let i = 0; i < wallsCollision.length; i++) {
+        //wwwwwwconsole.info(wallsCollision[i].x);
+
+        
+        if(wallsCollision[i].x - 2.1  < userXPos && wallsCollision[i].x + 2.1  > userXPos && Math.floor(wallsCollision[i].z) === Math.floor(userZPos)) {
+
+            console.info(direction);
+            userZPos += 0.5
+        }
+
+        if(wallsCollision[i].z - 2.1  < userZPos && wallsCollision[i].z + 2.1  > userZPos && Math.floor(wallsCollision[i].x) === Math.floor(userXPos)) {
+            userXPos += 0.5
+        }
+
+    }/*
+    console.info({
+        xPos: userXPos,
+        wallsCollisionX: wallsCollision[0].x,
+        zPos: userZPos,
+        wallsCollisionZ: wallsCollision[0].z,
+    });*/
+    
 
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
     var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
@@ -259,43 +305,6 @@ var render = function () {
 
     gl.bindTexture(gl.TEXTURE_2D, texVegg);
 
-    var wallsCollision = [];
-    
-    var spaceZ = 0;
-    for (let i = 0; i < board.length; i++) {
-        var spaceX = 0;
-        for (let j = 0; j < board[i].length; j++) {
-            if (board[i][j] === '-') {
-                wallsCollision.push({ x: spaceX, z: spaceZ});
-            } else if (board[i][j] === '|') {
-                wallsCollision.push({ x: spaceX, z: spaceZ});
-            }
-            spaceX += 3;
-        }
-        spaceX = 0;
-        spaceZ += 3;
-    }
-
-    for (let i = 0; i < wallsCollision.length; i++) {
-        //wwwwwwconsole.info(wallsCollision[i].x);
-
-        
-        if(wallsCollision[i].x - 3.1  < userXPos && wallsCollision[i].x + 3.1  > userXPos) {
-            if(wallsCollision[i].z - 3.1 < userZPos && wallsCollision[i].z + 3.1 > userZPos){
-        
-            }
-        }
-
-    }
-
-/*
-    console.info({
-        xPos: userXPos,
-        wallsCollisionX: wallsCollision[0].x,
-        zPos: userZPos,
-        wallsCollisionZ: wallsCollision[0].z,
-    });
-    */
 
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
