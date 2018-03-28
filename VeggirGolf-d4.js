@@ -257,12 +257,14 @@ var render = function () {
             if (board[i][j] === '-') {
                 wallsCollision.push({
                     x: spaceX,
-                    z: spaceZ
+                    z: spaceZ,
+                    sign: '-'
                 });
             } else if (board[i][j] === '|') {
                 wallsCollision.push({
                     x: spaceX,
-                    z: spaceZ
+                    z: spaceZ,
+                    sign: '|'
                 });
             }
             spaceX += 3;
@@ -275,18 +277,21 @@ var render = function () {
 
     for (let i = 0; i < wallsCollision.length; i++) {
 
-        if (Math.floor(userXPos) > wallsCollision[i].x - 3 && Math.floor(userXPos) < wallsCollision[i].x + 3 && Math.floor(userZPos) === wallsCollision[i].z ) {
-            
-            if(userprevZ > userZPos) {
-                userZDir = 0;
-            } else {
-                userZDir = 0;
-            }
+        if (Math.floor(userXPos) > wallsCollision[i].x - 3  && Math.floor(userXPos) < wallsCollision[i].x + 3 && Math.floor(userZPos) === wallsCollision[i].z && wallsCollision[i].sign === '-') {
+            console.info({ x: userXPos, wallX: wallsCollision[i].x, z: userZPos, wallZ: wallsCollision[i].z, type: wallsCollision[i].sign});
         }
+
+        if (Math.floor(userZPos) > wallsCollision[i].z - 3  && Math.floor(userZPos) < wallsCollision[i].z + 3 && Math.floor(userXPos) === wallsCollision[i].x && wallsCollision[i].sign === '|') {
+            console.info({ x: userXPos, wallX: wallsCollision[i].x, z: userZPos, wallZ: wallsCollision[i].z, type: wallsCollision[i].sign});
+        }
+
+
 
         //Math.floor(userZPos) > wallsCollision[i].z - 3 && Math.floor(userZPos) < wallsCollision[i].z + 3 && Math.floor(userXPos) === wallsCollision[i].x
 
     }
+
+    //console.info(wallsCollision);
 
 
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
