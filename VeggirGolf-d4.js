@@ -280,12 +280,20 @@ var render = function () {
     for (let i = 0; i < wallsCollision.length; i++) {
         for (let j = 0; j < wallsCollision[i].length; j++) {
 
-            if (wallsCollision[i][j].x + 3 > userXPos && wallsCollision[i][j].x - 3 < userXPos && wallsCollision[i][j].z === Math.floor(userZPos) && wallsCollision[i][j].sign === '-') {
-                console.info(wallsCollision[i][j]);
+            if (wallsCollision[i][j].x + 3 > userXPos && wallsCollision[i][j].x - 3 < userXPos && wallsCollision[i][j].z - 1 === Math.floor(userZPos) && wallsCollision[i][j].sign === '-') {
+                if(userprevZ >= userZPos) {
+                    userZPos += 1;
+                } else {
+                    userZPos -= 1;
+                }
             }
 
-            if (wallsCollision[i][j].z + 3 > userZPos && wallsCollision[i][j].z - 3 < userZPos && wallsCollision[i][j].x === Math.floor(userXPos) && wallsCollision[i][j].sign === '|') {
-                console.info(wallsCollision[i][j]);
+            if (wallsCollision[i][j].z + 3 > userZPos && wallsCollision[i][j].z - 3 < userZPos && wallsCollision[i][j].x - 1 === Math.floor(userXPos) && wallsCollision[i][j].sign === '|') {
+                if(userprevX >= userXPos) {
+                    userXPos += 1;
+                } else {
+                    userXPos -= 1;
+                }
             }
         }
     }
