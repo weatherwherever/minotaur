@@ -380,8 +380,11 @@ var render = function () {
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
     var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
-    var mvMiniMAP = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 100, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
+    var mvMiniMAP = lookAt(vec3(userXPos, 5, userZPos), vec3(userXPos + userXDir, 5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
+
+    gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mvMiniMAP));
+    var tmp = mvMiniMAP;
 
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     var mv1 = mv;
@@ -417,7 +420,8 @@ var render = function () {
                 gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
                 gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 
-
+                mv = tmp;
+                mv = mult(mv, translate(spaceX, 0.0, spaceZ));
                 gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
                 gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
             } else if (board[i][j] === '|') {
@@ -428,7 +432,10 @@ var render = function () {
                 gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
                 gl.drawArrays(gl.TRIANGLES, 0, numVertices);
 
-
+                
+                mv = tmp;
+                mv = mult(mv, translate(spaceX, 0.0, spaceZ));
+                mv = mult(mv, rotateY(90.0));
                 gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
                 gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
             }
