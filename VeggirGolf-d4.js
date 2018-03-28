@@ -380,7 +380,7 @@ var render = function () {
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
     var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
-    var mvMiniMAP = lookAt(vec3(userXPos, 5, userZPos), vec3(userXPos + userXDir, 5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
+    var mvMiniMAP = lookAt(vec3(userXPos, 50, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
 
     gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mvMiniMAP));
