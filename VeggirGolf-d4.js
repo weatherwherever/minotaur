@@ -253,15 +253,16 @@ var render = function () {
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
         var spaceX = 0;
+        var wallRow = []
         for (let j = 0; j < board[i].length; j++) {
             if (board[i][j] === '-') {
-                wallsCollision.push({
+                wallRow.push({
                     x: spaceX,
                     z: spaceZ,
                     sign: '-'
                 });
             } else if (board[i][j] === '|') {
-                wallsCollision.push({
+                wallRow.push({
                     x: spaceX,
                     z: spaceZ,
                     sign: '|'
@@ -269,6 +270,7 @@ var render = function () {
             }
             spaceX += 3;
         }
+        wallsCollision.push(wallRow);
         spaceX = 0;
         spaceZ += 3;
     }
@@ -276,24 +278,17 @@ var render = function () {
     /* collison */
 
     for (let i = 0; i < wallsCollision.length; i++) {
+        for (let j = 0; j < wallsCollision[i].length; j++) {
 
-        if (Math.floor(userXPos) > wallsCollision[i].x - 3  && Math.floor(userXPos) < wallsCollision[i].x + 3 && Math.floor(userZPos) === wallsCollision[i].z && wallsCollision[i].sign === '-') {
-            console.info({ x: userXPos, wallX: wallsCollision[i].x, z: userZPos, wallZ: wallsCollision[i].z, type: wallsCollision[i].sign});
+            if (wallsCollision[i][j].x + 3 > userXPos && wallsCollision[i][j].x - 3 < userXPos && wallsCollision[i][j].z === Math.floor(userZPos) && wallsCollision[i][j].sign === '-') {
+                console.info(wallsCollision[i][j]);
+            }
+
+            if (wallsCollision[i][j].z + 3 > userZPos && wallsCollision[i][j].z - 3 < userZPos && wallsCollision[i][j].x === Math.floor(userXPos) && wallsCollision[i][j].sign === '|') {
+                console.info(wallsCollision[i][j]);
+            }
         }
-
-        if (Math.floor(userZPos) > wallsCollision[i].z - 3  && Math.floor(userZPos) < wallsCollision[i].z + 3 && Math.floor(userXPos) === wallsCollision[i].x && wallsCollision[i].sign === '|') {
-            console.info({ x: userXPos, wallX: wallsCollision[i].x, z: userZPos, wallZ: wallsCollision[i].z, type: wallsCollision[i].sign});
-        }
-
-
-
-        //Math.floor(userZPos) > wallsCollision[i].z - 3 && Math.floor(userZPos) < wallsCollision[i].z + 3 && Math.floor(userXPos) === wallsCollision[i].x
-
     }
-
-    //console.info(wallsCollision);
-
-
     // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
     var mv = lookAt(vec3(userXPos, 0.5, userZPos), vec3(userXPos + userXDir, 0.5, userZPos + userZDir), vec3(0.0, 1.0, 0.0));
 
@@ -350,6 +345,6 @@ var render = function () {
 
 
     userprevX = userXPos;
-    userprevZ = userZPos; 
+    userprevZ = userZPos;
     requestAnimFrame(render);
 }
