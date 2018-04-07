@@ -109,6 +109,22 @@ var up = vec3(0.0, 1.0, 0.0);
 
 var normalMatrix, normalMatrixLoc;
 
+var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0 );
+var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+var materialAmbient = vec4( 0.2, 0.0, 0.2, 1.0 );
+var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0 );
+var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+var materialShininess = 100.0;
+
+var ctm;
+var ambientColor, diffuseColor, specularColor;
+
+var modelViewMatrix, projectionMatrix;
+var modelViewMatrixLoc, projectionMatrixLoc;
+
 window.onload = function init() {
 
 
@@ -127,9 +143,13 @@ window.onload = function init() {
         alert("WebGL isn't available");
     }
 
+    ambientProduct = mult(lightAmbient, materialAmbient);
+    diffuseProduct = mult(lightDiffuse, materialDiffuse);
+    specularProduct = mult(lightSpecular, materialSpecular);
+
     // get model
     var PR = PlyReader();
-    var plyData = PR.read("duck-n.ply");
+    var plyData = PR.read("minotaur-n.ply");
 
     plyvertices = plyData.points;
     plynormals = plyData.normals;
@@ -240,12 +260,12 @@ window.onload = function init() {
     nBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW );
-
+/*
     vNormal = gl.getAttribLocation( program, "vNormal" );
     gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vNormal );
 
-
+*/
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
@@ -303,10 +323,16 @@ window.onload = function init() {
 
     proLoc = gl.getUniformLocation(program, "projection");
     mvLoc = gl.getUniformLocation(program, "modelview");
+    normalMatrixLoc = gl.getUniformLocation( program, "normalMatrix" );
 
     var proj = perspective(50.0, 1.0, 0.2, 100.0);
     gl.uniformMatrix4fv(proLoc, false, flatten(proj));
 
+    gl.uniform4fv( gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct) );
+    gl.uniform4fv( gl.getUniformLocation(program, "diffuseProduct"), flatten(diffuseProduct) );
+    gl.uniform4fv( gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
+    gl.uniform4fv( gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
+    gl.uniform1f( gl.getUniformLocation(program, "shininess"), materialShininess );
 
     //event listeners for mouse
     canvas.addEventListener("mousedown", function (e) {
@@ -446,8 +472,9 @@ var render = function () {
 
     // Teikna g�lf me� mynstri/*
     gl.bindTexture(gl.TEXTURE_2D, texGolf);
+    
     mv = mv1;
-    mv = mult(mv, scalem(10.0, 10.0, 10.0));
+    mv = mult(mv, scalem(5.0, 5.0, 5.0));
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     gl.drawArrays(gl.TRIANGLES, numVertices, numVertices);
 
@@ -498,12 +525,12 @@ var render = function () {
     gl.deleteBuffer(tBuffer);
     gl.disableVertexAttribArray(vTexCoord);
     // viðbætt
-
+/*
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
     gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(normals) );
     gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vNormal );
-
+*/
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer2 );
     gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(plyvertices) );
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
