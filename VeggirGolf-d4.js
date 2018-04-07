@@ -50,6 +50,7 @@ var wallHack = {
   duration: 1000000000000000,
   active: false
 };
+var minoRandomCount = 5;
 
 /* board */
 var board;
@@ -130,7 +131,7 @@ var ambientColor, diffuseColor, specularColor;
 var modelViewMatrix, projectionMatrix;
 var modelViewMatrixLoc, projectionMatrixLoc;
 
-/* min movement */ 
+/* min movement */
 
 var minPosX = 1;
 var minPosY = 1;
@@ -465,6 +466,12 @@ window.onload = function init() {
           wallHack.active = !wallHack.active;
           wallHack.start = Date.now();
         }
+      case 88: // x
+        if (minoRandomCount > 0) {
+          minoRandomCount--;
+          minPosX = Math.floor(Math.random() * 30) + 0;
+          minPosZ = Math.floor(Math.random() * 30) + 0;
+        }
     }
   });
 
@@ -527,9 +534,12 @@ var render = function() {
     wallHack.active = false;
     wallHack.count--;
   }
+
   var weapons = document.getElementById("weapons");
   weapons.textContent = wallHack.count;
 
+  var minoCount = document.getElementById("sendMinoCount");
+  minoCount.textContent = minoRandomCount;
   /* collison */
 
   for (let i = 0; i < wallsCollision.length; i++) {
@@ -564,19 +574,19 @@ var render = function() {
     }
   }
 
-  if(userXPos < minPosX) {
+  if (userXPos < minPosX) {
     minPosX -= 0.025;
   }
 
-  if(userXPos > minPosX) {
+  if (userXPos > minPosX) {
     minPosX += 0.025;
   }
 
-  if(userZPos < minPosZ) {
+  if (userZPos < minPosZ) {
     minPosZ -= 0.025;
   }
 
-  if(userZPos > minPosZ) {
+  if (userZPos > minPosZ) {
     minPosZ += 0.025;
   }
 
@@ -586,7 +596,7 @@ var render = function() {
         wallsCollision[i][j].x + 3 > minPosX &&
         wallsCollision[i][j].x - 3 < minPosX &&
         wallsCollision[i][j].z === Math.floor(minPosZ) &&
-        wallsCollision[i][j].sign === "-" 
+        wallsCollision[i][j].sign === "-"
       ) {
         if (minPrevZ >= minPosZ) {
           minPosX -= 0.1;
@@ -599,9 +609,9 @@ var render = function() {
         wallsCollision[i][j].z + 4.5 > minPosZ &&
         wallsCollision[i][j].z - 4.5 < minPosZ &&
         wallsCollision[i][j].x === Math.floor(minPosX) &&
-        wallsCollision[i][j].sign === "|" 
+        wallsCollision[i][j].sign === "|"
       ) {
-        console.info('omgs');
+        console.info("omgs");
         if (minPrevX >= minPosX) {
           minPosZ -= 0.1;
         } else {
@@ -695,7 +705,6 @@ var render = function() {
     vec3(userXPos + userXDir, 0.5, userZPos + userZDir),
     vec3(0.0, 1.0, 0.0)
   );
-
 
   modelViewMatrix = mult(modelViewMatrix, translate(minPosX, minPosY, minPosZ));
   modelViewMatrix = mult(modelViewMatrix, rotateX(0));
