@@ -108,18 +108,21 @@ var at = vec3(0.0, 0.0, 0.0);
 var up = vec3(0.0, 1.0, 0.0);
 
 var normalMatrix, normalMatrixLoc;
+var modelViewLoc;
+var projectionLoc;
+var projectionMatrix;
+var normalMatrix, normalLoc;
 
-var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+var lightPosition = vec4(20.0, 100.0, 10.0, 1.0 );
 var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
 var materialAmbient = vec4( 0.2, 0.0, 0.2, 1.0 );
 var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0 );
-var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
-var materialShininess = 100.0;
+var materialSpecular = vec4( 1.0, 1, 1.0, 1.0 );
+var materialShininess = 15;
 
-var ctm;
 var ambientColor, diffuseColor, specularColor;
 
 var modelViewMatrix, projectionMatrix;
@@ -245,6 +248,7 @@ window.onload = function init() {
     diffuseProduct = mult(lightDiffuse, materialDiffuse);
     specularProduct = mult(lightSpecular, materialSpecular);
 
+    
     //
     //  Load shaders and initialize attribute buffers
     //
@@ -312,11 +316,13 @@ window.onload = function init() {
     proj = perspective(50.0, 1.0, 0.2, 100.0);
     gl.uniformMatrix4fv(proLoc, false, flatten(proj));
 
+
     gl.uniform4fv( gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct) );
     gl.uniform4fv( gl.getUniformLocation(program, "diffuseProduct"), flatten(diffuseProduct) );
     gl.uniform4fv( gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
     gl.uniform4fv( gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
     gl.uniform1f( gl.getUniformLocation(program, "shininess"), materialShininess );
+
 
     //event listeners for mouse
     canvas.addEventListener("mousedown", function (e) {
@@ -507,7 +513,6 @@ var render = function () {
 
     }
 
-    gl.bindTexture( gl.TEXTURE_2D, null);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.deleteBuffer(tBuffer);
     gl.disableVertexAttribArray(vTexCoord);
@@ -527,13 +532,14 @@ var render = function () {
     modelViewMatrix = mult( modelViewMatrix, rotateY( 0 ) );
     modelViewMatrix = mult( modelViewMatrix, rotateX( 0 ) );
 
+    gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix) );
+    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
     normalMatrix = [
         vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
         vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
         vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
     ];
-    gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix) );
-    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
+   
 
     gl.drawArrays( gl.TRIANGLES, 0, plyvertices.length );
 
