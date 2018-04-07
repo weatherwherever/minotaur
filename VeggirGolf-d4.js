@@ -417,6 +417,8 @@ window.onload = function init() {
 
 var render = function () {
 
+    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    
     var tBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW );
@@ -519,7 +521,7 @@ var render = function () {
 
 
     }
-
+/*
     gl.bindTexture( gl.TEXTURE_2D, null);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.deleteBuffer(tBuffer);
