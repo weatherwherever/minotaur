@@ -143,6 +143,12 @@ window.onload = function init() {
         alert("WebGL isn't available");
     }
 
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.9, 1.0, 1.0, 1.0);
+
+    gl.enable(gl.DEPTH_TEST);
+
+
     // get model
     var PR = PlyReader();
     var plyData = PR.read("minotaur-n.ply");
@@ -206,11 +212,7 @@ window.onload = function init() {
     gl_minimap.uniformMatrix4fv(proLoc, false, flatten(proj));
 
     /****************************** */
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.9, 1.0, 1.0, 1.0);
-
-    gl.enable(gl.DEPTH_TEST);
-
+    
     
 
     /* read txt file */
@@ -236,6 +238,9 @@ window.onload = function init() {
     console.info(board);
 
 
+    program = initShaders(gl, "vertex-shader", "fragment-shader");
+    gl.useProgram(program);
+
     ambientProduct = mult(lightAmbient, materialAmbient);
     diffuseProduct = mult(lightDiffuse, materialDiffuse);
     specularProduct = mult(lightSpecular, materialSpecular);
@@ -243,8 +248,6 @@ window.onload = function init() {
     //
     //  Load shaders and initialize attribute buffers
     //
-    program = initShaders(gl, "vertex-shader", "fragment-shader");
-    gl.useProgram(program);
 
     // normals array attribute buffer
     nBuffer = gl.createBuffer();
@@ -254,7 +257,6 @@ window.onload = function init() {
     vNormal = gl.getAttribLocation( program, "vNormal" );
     gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vNormal );
-
 */
     vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
@@ -307,7 +309,7 @@ window.onload = function init() {
     mvLoc = gl.getUniformLocation(program, "modelview");
     normalMatrixLoc = gl.getUniformLocation( program, "normalMatrix" );
 
-    var proj = perspective(50.0, 1.0, 0.2, 100.0);
+    proj = perspective(50.0, 1.0, 0.2, 100.0);
     gl.uniformMatrix4fv(proLoc, false, flatten(proj));
 
     gl.uniform4fv( gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct) );
