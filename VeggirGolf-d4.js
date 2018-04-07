@@ -47,7 +47,7 @@ var mvLoc_minimap;
 
 var wallHack = {
   count: 1,
-  duration: 5000,
+  duration: 1000000000000000,
   active: false
 };
 
@@ -130,6 +130,14 @@ var ambientColor, diffuseColor, specularColor;
 var modelViewMatrix, projectionMatrix;
 var modelViewMatrixLoc, projectionMatrixLoc;
 
+/* min movement */ 
+
+var minPosX = 1;
+var minPosY = 1;
+var minPosZ = 1;
+
+var minPrevX;
+var minPrevZ;
 window.onload = function init() {
   canvas = document.getElementById("gl-canvas");
 
@@ -556,6 +564,53 @@ var render = function() {
     }
   }
 
+  if(userXPos < minPosX) {
+    minPosX -= 0.025;
+  }
+
+  if(userXPos > minPosX) {
+    minPosX += 0.025;
+  }
+
+  if(userZPos < minPosZ) {
+    minPosZ -= 0.025;
+  }
+
+  if(userZPos > minPosZ) {
+    minPosZ += 0.025;
+  }
+
+  for (let i = 0; i < wallsCollision.length; i++) {
+    for (let j = 0; j < wallsCollision[i].length; j++) {
+      if (
+        wallsCollision[i][j].x + 3 > minPosX &&
+        wallsCollision[i][j].x - 3 < minPosX &&
+        wallsCollision[i][j].z === Math.floor(minPosZ) &&
+        wallsCollision[i][j].sign === "-" 
+      ) {
+        if (minPrevZ >= minPosZ) {
+          minPosX -= 0.1;
+        } else {
+          minPosX += 0.1;
+        }
+      }
+
+      if (
+        wallsCollision[i][j].z + 4.5 > minPosZ &&
+        wallsCollision[i][j].z - 4.5 < minPosZ &&
+        wallsCollision[i][j].x === Math.floor(minPosX) &&
+        wallsCollision[i][j].sign === "|" 
+      ) {
+        console.info('omgs');
+        if (minPrevX >= minPosX) {
+          minPosZ -= 0.1;
+        } else {
+          minPosZ += 0.1;
+        }
+      }
+    }
+  }
+
   // sta�setja �horfanda og me�h�ndla m�sarhreyfingu
   var mv = lookAt(
     vec3(userXPos, 0.5, userZPos),
@@ -579,7 +634,7 @@ var render = function() {
   gl.bindTexture(gl.TEXTURE_2D, texGolf);
 
   mv = mv1;
-  mv = mult(mv, scalem(5.0, 5.0, 5.0));
+  mv = mult(mv, scalem(10.0, 10.0, 10.0));
   gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
   gl.drawArrays(gl.TRIANGLES, numVertices, numVertices);
 
@@ -640,9 +695,11 @@ var render = function() {
     vec3(userXPos + userXDir, 0.5, userZPos + userZDir),
     vec3(0.0, 1.0, 0.0)
   );
-  modelViewMatrix = mult(modelViewMatrix, translate(0, 0, 0));
+
+
+  modelViewMatrix = mult(modelViewMatrix, translate(minPosX, minPosY, minPosZ));
   modelViewMatrix = mult(modelViewMatrix, rotateX(0));
-  modelViewMatrix = mult(modelViewMatrix, scalem(5, 5, 5));
+  modelViewMatrix = mult(modelViewMatrix, scalem(1, 1, 1));
 
   gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix));
   gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
@@ -656,5 +713,7 @@ var render = function() {
 
   userprevX = userXPos;
   userprevZ = userZPos;
+  minPrevX = minPosX;
+  minPrevZ = minPosZ;
   requestAnimFrame(render);
 };
