@@ -57,6 +57,14 @@ var board;
 var gl_minimap;
 
 var direction = '';
+
+/* ply */
+
+var vBuffer;
+var vBuffer2;
+var vPosition;
+var vNormal;
+var nBuffer;
 // Hn�tar veggsins
 var vertices = [
     vec4(-3.0, 0.0, 0.0, 1.0),
@@ -90,7 +98,16 @@ var texCoords = [
     vec2(0.0, 10.0),
     vec2(0.0, 0.0)
 ];
+var wallsCollision = [];
 
+/* ply */
+
+var normals = [];
+
+var at = vec3(0.0, 0.0, 0.0);
+var up = vec3(0.0, 1.0, 0.0);
+
+var normalMatrix, normalMatrixLoc;
 
 window.onload = function init() {
 
@@ -110,6 +127,13 @@ window.onload = function init() {
         alert("WebGL isn't available");
     }
 
+    // get model
+    var PR = PlyReader();
+    var plyData = PR.read("duck-n.ply");
+
+    plyvertices = plyData.points;
+    plynormals = plyData.normals;
+
     gl_minimap.viewport(0, 0, canvas_minimap.width, canvas_minimap.height);
     gl_minimap.clearColor(0.9, 1.0, 1.0, 1.0);
     gl_minimap.enable(gl_minimap.DEPTH_TEST);
@@ -120,7 +144,7 @@ window.onload = function init() {
     gl_minimap.bindBuffer(gl_minimap.ARRAY_BUFFER, vBuffer);
     gl_minimap.bufferData(gl_minimap.ARRAY_BUFFER, flatten(vertices), gl_minimap.STATIC_DRAW);
 
-    var vPosition = gl_minimap.getAttribLocation(program, "vPosition");
+    vPosition = gl_minimap.getAttribLocation(program, "vPosition");
     gl_minimap.vertexAttribPointer(vPosition, 4, gl_minimap.FLOAT, false, 0, 0);
     gl_minimap.enableVertexAttribArray(vPosition);
 
@@ -212,21 +236,35 @@ window.onload = function init() {
     program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
-    var vBuffer = gl.createBuffer();
+    // normals array attribute buffer
+    nBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW );
+
+    vNormal = gl.getAttribLocation( program, "vNormal" );
+    gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vNormal );
+
+
+    vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+
+    vBuffer2 = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer2);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(plyvertices), gl.STATIC_DRAW);
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
-
+/*
     var tBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW);
 
     var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
     gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vTexCoord);
+    gl.enableVertexAttribArray(vTexCoord);*/
 
     // Lesa inn og skilgreina mynstur fyrir vegg
     var veggImage = document.getElementById("VeggImage");
@@ -318,16 +356,7 @@ window.onload = function init() {
 
     });
 
-    render();
-
-}
-
-
-var render = function () {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl_minimap.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    var wallsCollision = [];
+    
 
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
@@ -353,6 +382,32 @@ var render = function () {
         spaceX = 0;
         spaceZ += 3;
     }
+
+
+    render();
+
+}
+
+
+var render = function () {
+
+    var tBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW );
+    
+    var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
+    gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vTexCoord );
+    
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW );
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
+
+
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl_minimap.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
 
     /* collison */
 
@@ -395,18 +450,8 @@ var render = function () {
     mv = mult(mv, scalem(10.0, 10.0, 10.0));
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     gl.drawArrays(gl.TRIANGLES, numVertices, numVertices);
-    // Teikna loft me� mynstri
-    /*
-    gl.bindTexture( gl.TEXTURE_2D, texLoft );
-    mv = mult( mv, translate( 0.0, 1.0, 0.0 ) );
-    gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
-    gl.drawArrays( gl.TRIANGLES, numVertices, numVertices );
-    */
-    // Teikna framvegg me� mynstri/*
 
     gl.bindTexture(gl.TEXTURE_2D, texVegg);
-
-
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
 
@@ -447,6 +492,36 @@ var render = function () {
 
 
     }
+
+    gl.bindTexture( gl.TEXTURE_2D, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.deleteBuffer(tBuffer);
+    gl.disableVertexAttribArray(vTexCoord);
+    // viðbætt
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
+    gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(normals) );
+    gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vNormal );
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer2 );
+    gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(plyvertices) );
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
+
+    modelViewMatrix = lookAt( vec3(0.0, 0.0, -3.0), at, up );
+    modelViewMatrix = mult( modelViewMatrix, rotateY( 0 ) );
+    modelViewMatrix = mult( modelViewMatrix, rotateX( 0 ) );
+
+    normalMatrix = [
+        vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
+        vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
+        vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
+    ];
+    gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix) );
+    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
+
+    gl.drawArrays( gl.TRIANGLES, 0, plyvertices.length );
 
 
     userprevX = userXPos;
