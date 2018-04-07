@@ -1,0 +1,61 @@
+var render = function(){
+    var tBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW );
+    
+    var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
+    gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vTexCoord );
+    
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW );
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
+    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+    // staðsetja áhorfanda og meðhöndla músarhreyfingu
+    var mv = lookAt( vec3(userXPos, 0.5, userZPos), vec3(userXPos+userXDir, 0.5, userZPos+userZDir), vec3(0.0, 1.0, 0.0 ) );
+    
+    gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
+
+    // Teikna vegg með mynstri
+    gl.bindTexture( gl.TEXTURE_2D, texVegg );
+    gl.drawArrays( gl.TRIANGLES, 0, numWallVertices );
+
+    // Teikna gólf með mynstri
+    gl.bindTexture( gl.TEXTURE_2D, texGolf );
+    gl.drawArrays( gl.TRIANGLES, numWallVertices, numFloorVertices );
+    
+    gl.bindTexture( gl.TEXTURE_2D, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.deleteBuffer(tBuffer);
+    gl.disableVertexAttribArray(vTexCoord);
+    // viðbætt
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
+    gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(normals) );
+    gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vNormal );
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer2 );
+    gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(plyVertices) );
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
+
+
+    modelViewMatrix = lookAt( vec3(0.0, 0.0, -3.0), at, up );
+    modelViewMatrix = mult( modelViewMatrix, rotateY( 0 ) );
+    modelViewMatrix = mult( modelViewMatrix, rotateX( 0 ) );
+
+    normalMatrix = [
+        vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
+        vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
+        vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
+    ];
+    gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix) );
+    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
+
+    gl.drawArrays( gl.TRIANGLES, 0, plyVertices.length );
+
+    requestAnimFrame(render);
+}

@@ -57,6 +57,14 @@ var board;
 var gl_minimap;
 
 var direction = '';
+
+/* ply */
+
+var vBuffer;
+var vBuffer2;
+var vPosition;
+var vNormal;
+var nBuffer;
 // Hn�tar veggsins
 var vertices = [
     vec4(-3.0, 0.0, 0.0, 1.0),
@@ -90,7 +98,32 @@ var texCoords = [
     vec2(0.0, 10.0),
     vec2(0.0, 0.0)
 ];
+var wallsCollision = [];
 
+/* ply */
+
+var normals = [];
+
+var at = vec3(0.0, 0.0, 0.0);
+var up = vec3(0.0, 1.0, 0.0);
+
+var normalMatrix, normalMatrixLoc;
+
+var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0 );
+var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
+var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+var materialAmbient = vec4( 0.2, 0.0, 0.2, 1.0 );
+var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0 );
+var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+var materialShininess = 100.0;
+
+var ctm;
+var ambientColor, diffuseColor, specularColor;
+
+var modelViewMatrix, projectionMatrix;
+var modelViewMatrixLoc, projectionMatrixLoc;
 
 window.onload = function init() {
 
@@ -110,27 +143,32 @@ window.onload = function init() {
         alert("WebGL isn't available");
     }
 
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clearColor(0.9, 1.0, 1.0, 1.0);
+
+    gl.enable(gl.DEPTH_TEST);
+
+
+    // get model
+    var PR = PlyReader();
+    var plyData = PR.read("minotaur-n.ply");
+
+    plyvertices = plyData.points;
+    plynormals = plyData.normals;
+
     gl_minimap.viewport(0, 0, canvas_minimap.width, canvas_minimap.height);
     gl_minimap.clearColor(0.9, 1.0, 1.0, 1.0);
     gl_minimap.enable(gl_minimap.DEPTH_TEST);
     program = initShaders(gl_minimap, "vertex-shader", "fragment-shader");
     gl_minimap.useProgram(program);
 
-    var vBuffer = gl_minimap.createBuffer();
-    gl_minimap.bindBuffer(gl_minimap.ARRAY_BUFFER, vBuffer);
+    vBufferMinimap = gl_minimap.createBuffer();
+    gl_minimap.bindBuffer(gl_minimap.ARRAY_BUFFER, vBufferMinimap);
     gl_minimap.bufferData(gl_minimap.ARRAY_BUFFER, flatten(vertices), gl_minimap.STATIC_DRAW);
 
-    var vPosition = gl_minimap.getAttribLocation(program, "vPosition");
+    vPosition = gl_minimap.getAttribLocation(program, "vPosition");
     gl_minimap.vertexAttribPointer(vPosition, 4, gl_minimap.FLOAT, false, 0, 0);
     gl_minimap.enableVertexAttribArray(vPosition);
-
-    var tBuffer = gl_minimap.createBuffer();
-    gl_minimap.bindBuffer(gl_minimap.ARRAY_BUFFER, tBuffer);
-    gl_minimap.bufferData(gl_minimap.ARRAY_BUFFER, flatten(texCoords), gl_minimap.STATIC_DRAW);
-
-    var vTexCoord = gl_minimap.getAttribLocation(program, "vTexCoord");
-    gl_minimap.vertexAttribPointer(vTexCoord, 2, gl_minimap.FLOAT, false, 0, 0);
-    gl_minimap.enableVertexAttribArray(vTexCoord);
 
     // Lesa inn og skilgreina mynstur fyrir vegg
     var veggImage = document.getElementById("VeggImage");
@@ -174,11 +212,7 @@ window.onload = function init() {
     gl_minimap.uniformMatrix4fv(proLoc, false, flatten(proj));
 
     /****************************** */
-    gl.viewport(0, 0, canvas.width, canvas.height);
-    gl.clearColor(0.9, 1.0, 1.0, 1.0);
-
-    gl.enable(gl.DEPTH_TEST);
-
+    
     
 
     /* read txt file */
@@ -204,29 +238,37 @@ window.onload = function init() {
     console.info(board);
 
 
+    program = initShaders(gl, "vertex-shader", "fragment-shader");
+    gl.useProgram(program);
 
+    ambientProduct = mult(lightAmbient, materialAmbient);
+    diffuseProduct = mult(lightDiffuse, materialDiffuse);
+    specularProduct = mult(lightSpecular, materialSpecular);
 
     //
     //  Load shaders and initialize attribute buffers
     //
-    program = initShaders(gl, "vertex-shader", "fragment-shader");
-    gl.useProgram(program);
 
-    var vBuffer = gl.createBuffer();
+    // normals array attribute buffer
+    nBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(normals), gl.STATIC_DRAW );
+/*
+    vNormal = gl.getAttribLocation( program, "vNormal" );
+    gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vNormal );
+*/
+    vBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW);
+
+    vBuffer2 = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vBuffer2);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(plyvertices), gl.STATIC_DRAW);
 
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
-
-    var tBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW);
-
-    var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
-    gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vTexCoord);
 
     // Lesa inn og skilgreina mynstur fyrir vegg
     var veggImage = document.getElementById("VeggImage");
@@ -265,10 +307,16 @@ window.onload = function init() {
 
     proLoc = gl.getUniformLocation(program, "projection");
     mvLoc = gl.getUniformLocation(program, "modelview");
+    normalMatrixLoc = gl.getUniformLocation( program, "normalMatrix" );
 
-    var proj = perspective(50.0, 1.0, 0.2, 100.0);
+    proj = perspective(50.0, 1.0, 0.2, 100.0);
     gl.uniformMatrix4fv(proLoc, false, flatten(proj));
 
+    gl.uniform4fv( gl.getUniformLocation(program, "ambientProduct"), flatten(ambientProduct) );
+    gl.uniform4fv( gl.getUniformLocation(program, "diffuseProduct"), flatten(diffuseProduct) );
+    gl.uniform4fv( gl.getUniformLocation(program, "specularProduct"), flatten(specularProduct) );
+    gl.uniform4fv( gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition) );
+    gl.uniform1f( gl.getUniformLocation(program, "shininess"), materialShininess );
 
     //event listeners for mouse
     canvas.addEventListener("mousedown", function (e) {
@@ -318,16 +366,7 @@ window.onload = function init() {
 
     });
 
-    render();
-
-}
-
-
-var render = function () {
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    gl_minimap.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-
-    var wallsCollision = [];
+    
 
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
@@ -353,6 +392,35 @@ var render = function () {
         spaceX = 0;
         spaceZ += 3;
     }
+
+
+    render();
+
+}
+
+
+var render = function () {
+
+    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    
+    var tBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW );
+    
+    var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
+    gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vTexCoord );
+    
+    
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW );
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
+
+
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl_minimap.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
 
     /* collison */
 
@@ -391,22 +459,13 @@ var render = function () {
 
     // Teikna g�lf me� mynstri/*
     gl.bindTexture(gl.TEXTURE_2D, texGolf);
+    
     mv = mv1;
-    mv = mult(mv, scalem(10.0, 10.0, 10.0));
+    mv = mult(mv, scalem(5.0, 5.0, 5.0));
     gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
     gl.drawArrays(gl.TRIANGLES, numVertices, numVertices);
-    // Teikna loft me� mynstri
-    /*
-    gl.bindTexture( gl.TEXTURE_2D, texLoft );
-    mv = mult( mv, translate( 0.0, 1.0, 0.0 ) );
-    gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
-    gl.drawArrays( gl.TRIANGLES, numVertices, numVertices );
-    */
-    // Teikna framvegg me� mynstri/*
 
     gl.bindTexture(gl.TEXTURE_2D, texVegg);
-
-
     var spaceZ = 0;
     for (let i = 0; i < board.length; i++) {
 
@@ -447,6 +506,36 @@ var render = function () {
 
 
     }
+
+    gl.bindTexture( gl.TEXTURE_2D, null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.deleteBuffer(tBuffer);
+    gl.disableVertexAttribArray(vTexCoord);
+    //// viðbætt
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
+    gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(normals) );
+    gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vNormal );
+
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer2 );
+    gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(plyvertices) );
+    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( vPosition );
+
+    modelViewMatrix = lookAt( vec3(0.0, 0.0, -3.0), at, up );
+    modelViewMatrix = mult( modelViewMatrix, rotateY( 0 ) );
+    modelViewMatrix = mult( modelViewMatrix, rotateX( 0 ) );
+
+    normalMatrix = [
+        vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
+        vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),
+        vec3(modelViewMatrix[2][0], modelViewMatrix[2][1], modelViewMatrix[2][2])
+    ];
+    gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix) );
+    gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix) );
+
+    gl.drawArrays( gl.TRIANGLES, 0, plyvertices.length );
 
 
     userprevX = userXPos;
