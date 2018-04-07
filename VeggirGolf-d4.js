@@ -143,10 +143,6 @@ window.onload = function init() {
         alert("WebGL isn't available");
     }
 
-    ambientProduct = mult(lightAmbient, materialAmbient);
-    diffuseProduct = mult(lightDiffuse, materialDiffuse);
-    specularProduct = mult(lightSpecular, materialSpecular);
-
     // get model
     var PR = PlyReader();
     var plyData = PR.read("minotaur-n.ply");
@@ -160,21 +156,13 @@ window.onload = function init() {
     program = initShaders(gl_minimap, "vertex-shader", "fragment-shader");
     gl_minimap.useProgram(program);
 
-    var vBuffer = gl_minimap.createBuffer();
-    gl_minimap.bindBuffer(gl_minimap.ARRAY_BUFFER, vBuffer);
+    vBufferMinimap = gl_minimap.createBuffer();
+    gl_minimap.bindBuffer(gl_minimap.ARRAY_BUFFER, vBufferMinimap);
     gl_minimap.bufferData(gl_minimap.ARRAY_BUFFER, flatten(vertices), gl_minimap.STATIC_DRAW);
 
     vPosition = gl_minimap.getAttribLocation(program, "vPosition");
     gl_minimap.vertexAttribPointer(vPosition, 4, gl_minimap.FLOAT, false, 0, 0);
     gl_minimap.enableVertexAttribArray(vPosition);
-
-    var tBuffer = gl_minimap.createBuffer();
-    gl_minimap.bindBuffer(gl_minimap.ARRAY_BUFFER, tBuffer);
-    gl_minimap.bufferData(gl_minimap.ARRAY_BUFFER, flatten(texCoords), gl_minimap.STATIC_DRAW);
-
-    var vTexCoord = gl_minimap.getAttribLocation(program, "vTexCoord");
-    gl_minimap.vertexAttribPointer(vTexCoord, 2, gl_minimap.FLOAT, false, 0, 0);
-    gl_minimap.enableVertexAttribArray(vTexCoord);
 
     // Lesa inn og skilgreina mynstur fyrir vegg
     var veggImage = document.getElementById("VeggImage");
@@ -248,7 +236,9 @@ window.onload = function init() {
     console.info(board);
 
 
-
+    ambientProduct = mult(lightAmbient, materialAmbient);
+    diffuseProduct = mult(lightDiffuse, materialDiffuse);
+    specularProduct = mult(lightSpecular, materialSpecular);
 
     //
     //  Load shaders and initialize attribute buffers
@@ -277,14 +267,6 @@ window.onload = function init() {
     var vPosition = gl.getAttribLocation(program, "vPosition");
     gl.vertexAttribPointer(vPosition, 4, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(vPosition);
-/*
-    var tBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, tBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(texCoords), gl.STATIC_DRAW);
-
-    var vTexCoord = gl.getAttribLocation(program, "vTexCoord");
-    gl.vertexAttribPointer(vTexCoord, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vTexCoord);*/
 
     // Lesa inn og skilgreina mynstur fyrir vegg
     var veggImage = document.getElementById("VeggImage");
@@ -427,7 +409,8 @@ var render = function () {
     gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vTexCoord );
     
-    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
+    
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(vertices), gl.STATIC_DRAW );
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
@@ -521,18 +504,18 @@ var render = function () {
 
 
     }
-/*
+
     gl.bindTexture( gl.TEXTURE_2D, null);
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.deleteBuffer(tBuffer);
     gl.disableVertexAttribArray(vTexCoord);
-    // viðbætt
-/*
+    //// viðbætt
+
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
     gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(normals) );
     gl.vertexAttribPointer( vNormal, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vNormal );
-*/
+
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer2 );
     gl.bufferSubData( gl.ARRAY_BUFFER, 0, flatten(plyvertices) );
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
