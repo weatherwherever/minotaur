@@ -9,55 +9,65 @@
 
 attribute  vec4 vPosition;
 attribute  vec2 vTexCoord;
-attribute vec4 vNormal;
 attribute vec4 a_color;
 
+// vibætt
+attribute vec4 vNormal;
 varying vec3 N, L, E;
+// viðbætt
 
 varying vec4 fColor;
 varying vec2 fTexCoord;
 
 uniform mat4 projection;
-uniform mat4 modelview;
+uniform mat4 modelViewMatrix;
+
+// viðbætt
 uniform vec4 lightPosition;
 uniform mat3 normalMatrix;
+// viðbætt
 
-void main()
+void main() 
 {
-    vec3 pos = (modelview * vPosition).xyz;
+    // viðbætt
+    vec3 pos = (modelViewMatrix * vPosition).xyz;
 
+    // check for directional light
     if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
     else L = normalize( lightPosition.xyz - pos );
 
     E =  -normalize(pos);
     N = normalize( normalMatrix*vNormal.xyz);
+    // viðbætt
 
     fTexCoord = vTexCoord;
     fColor = a_color;
-    gl_Position = projection * modelview * vPosition;
-}
+    gl_Position = projection * modelViewMatrix * vPosition;
+} 
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
 
 precision mediump float;
 
-varying vec4 fColor;
-varying vec2 fTexCoord;
-
-uniform sampler2D texture;
-uniform bool u_color;
-
+// viðbætt
 uniform vec4 ambientProduct;
 uniform vec4 diffuseProduct;
 uniform vec4 specularProduct;
 uniform float shininess;
 varying vec3 N, L, E;
+// viðbætt
 
+//varying vec4 fColor;
+varying vec2 fTexCoord;
+
+uniform bool u_color;
+uniform sampler2D texture;
 
 void
 main()
 {
+    // viðbætt
     vec4 fColor;
 
     if(!u_color){
@@ -76,8 +86,9 @@ main()
         fColor.a = 1.0;
         // viðbætt
     }
-
+    
     gl_FragColor = texture2D( texture, fTexCoord ) * fColor;
+//    gl_FragColor = texture2D( texture, fTexCoord );
 }
 </script>
 
@@ -86,22 +97,15 @@ main()
 <script type="text/javascript" src="./Common/initShaders.js"></script>
 <script type="text/javascript" src="./Common/MV.js"></script>
 <script type="text/javascript" src="PlyReader.js"></script>
-<script type="text/javascript" src="VeggirGolf-d4.js"></script>
+<script type="text/javascript" src="VeggurGolf.js"></script>
 
 
 <body>
-<canvas id="gl-canvas" width="1500" height="800">
+<canvas id="gl-canvas" width="800" height="800">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
-<div>Getur farið í gegnum veggi:</div>
-<div id="weapons"> </div>
-<div id="timer"> </div>
-<canvas id="minimap" width="300" height="300">
-    Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
 
 <img id = "VeggImage" src = "brick29.jpg" hidden></img>
 <img id = "GolfImage" src = "WoodPlanks.jpg" hidden></img>
-<img id = "LoftImage" src = "cloud07.jpg" hidden></img>
 </body>
 </html>
