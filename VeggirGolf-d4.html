@@ -16,11 +16,11 @@ varying vec2 fTexCoord;
 uniform mat4 projection;
 uniform mat4 modelview;
 
-void main() 
+void main()
 {
     fTexCoord = vTexCoord;
     gl_Position = projection * modelview * vPosition;
-} 
+}
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
@@ -51,6 +51,9 @@ main()
 <canvas id="gl-canvas" width="1500" height="800">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
+<div>Getur farið í gegnum veggi:</div>
+<div id="weapons"> </div>
+<div id="timer"> </div>
 <canvas id="minimap" width="300" height="300">
     Oops ... your browser doesn't support the HTML5 canvas element
     </canvas>

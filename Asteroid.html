@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<style type="text/css">
+    canvas { background: blue; }
+</style>
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+
+attribute vec4 vNormal;
+attribute vec4 vPosition;
+//attribute  vec2 vTexCoord;
+attribute vec4 vColor;
+
+varying vec4 fColor;
+//varying vec2 fTexCoord;
+varying vec3 N, L, E;
+
+uniform mat4 projection;
+uniform mat4 modelview;
+uniform mat4 scale;
+uniform vec4 vOffset;
+uniform vec4 lightPosition;
+uniform mat3 normalMatrix;
+
+void main() 
+{
+	vec4 correctOffset = (scale*vPosition) + vOffset;
+	vec3 pos = (modelview * correctOffset).xyz;
+
+	// check for directional light
+    if(lightPosition.w == 0.0) L = normalize(lightPosition.xyz);
+    else L = normalize( lightPosition.xyz - pos );
+
+    E =  -normalize(pos);
+    N = normalize( normalMatrix*vNormal.xyz);
+
+	//vec4 correctOffset = (scale*vPosition) + vOffset;
+    fColor = vColor;
+    gl_Position = projection * modelview * correctOffset;
+} 
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+
+precision mediump float;
+
+uniform vec4 ambientProduct;
+uniform vec4 diffuseProduct;
+uniform vec4 specularProduct;
+uniform float shininess;
+
+varying vec4 fColor;
+//varying vec2 fTexCoord;
+varying vec3 N, L, E;
+
+//uniform sampler2D texture;
+
+void
+main()
+{	
+	vec3 H = normalize( L + E );
+    vec4 ambient = ambientProduct;
+
+    float Kd = max( dot(L, N), 0.0 );
+    vec4 diffuse = Kd*diffuseProduct;
+
+    float Ks = pow( max(dot(N, H), 0.0), shininess );
+   	vec4  specular = Ks * specularProduct;
+
+    vec4 tColor =  ambient + diffuse + specular;
+
+    gl_FragColor = tColor;
+    //gl_FragColor = tColor * fColor;
+
+	//gl_FragColor = fColor * texture2D( texture, fTexCoord );
+    //gl_FragColor = fColor;
+}
+</script>
+
+<script type="text/javascript" src="Common/webgl-utils.js"></script>
+<script type="text/javascript" src="Common/initShaders.js"></script>
+<script type="text/javascript" src="Common/MV.js"></script>
+<script type="text/javascript" src="PlyReader.js"></script>
+<script type="text/javascript" src="Asteroid.js"></script>
+
+
+<body>
+<canvas id="gl-canvas" width="800" height="800">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+
+ <audio id="audioShoot" src="fire.wav" autostart="false" ></audio>
+ <audio id="audioBangLarge" src="bangLarge.wav" autostart="false" ></audio>
+ <audio id="audioBangMedium" src="bangMedium.wav" autostart="false" ></audio>
+ <audio id="audioBangSmall" src="bangSmall.wav" autostart="false" ></audio>
+ <audio id="audioThrust" src="thrust.wav" autostart="false" ></audio>
+ <audio id="audioSaucerBig" src="saucerBig.wav" autostart="false" ></audio>
+
+ <p id="lifesLeft"> mbleel</p>
+ <p id="currentScore"> mbleel</p>
+
+</body>
+</html>
