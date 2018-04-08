@@ -50,7 +50,7 @@ var mvLoc_minimap;
 var gameover = false;
 var wallHack = {
   count: 1,
-  duration: 1000000000000000,
+  duration: 5000,
   active: false
 };
 var minoRandomCount = 5;
@@ -137,9 +137,9 @@ var modelViewMatrixLoc, projectionMatrixLoc;
 
 /* min movement */
 
-var minPosX = 1;
+var minPosX = Math.floor(Math.random() * 30) + 0;
 var minPosY = 1;
-var minPosZ = 1;
+var minPosZ = Math.floor(Math.random() * 30) + 0;
 
 var minPrevX;
 var minPrevZ;
@@ -673,23 +673,22 @@ var render = function() {
         wallsCollision[i][j].sign === "-"
       ) {
         if (minPrevZ >= minPosZ) {
-          minPosX -= 0.1;
+          minPosZ += 0.1;
         } else {
-          minPosX += 0.1;
+          minPosZ -= 0.1;
         }
       }
 
       if (
-        wallsCollision[i][j].z + 4.5 > minPosZ &&
-        wallsCollision[i][j].z - 4.5 < minPosZ &&
+        wallsCollision[i][j].z + 3 > minPosZ &&
+        wallsCollision[i][j].z - 3 < minPosZ &&
         wallsCollision[i][j].x === Math.floor(minPosX) &&
         wallsCollision[i][j].sign === "|"
       ) {
-        console.info("omgs");
         if (minPrevX >= minPosX) {
-          minPosZ -= 0.1;
+          minPosX += 0.1;
         } else {
-          minPosZ += 0.1;
+          minPosX -= 0.1;
         }
       }
     }
@@ -821,7 +820,7 @@ var render = function() {
   modelViewMatrix = mult(modelViewMatrix, scalem(1, 1, 1));
 
   gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix));
-  gl.uniformMatrix3fv(normalMatrixLoc, false, flatten(normalMatrix));
+  gl.uniformMatrix3fv(normalLoc, false, flatten(normalMatrix));
   normalMatrix = [
     vec3(modelViewMatrix[0][0], modelViewMatrix[0][1], modelViewMatrix[0][2]),
     vec3(modelViewMatrix[1][0], modelViewMatrix[1][1], modelViewMatrix[1][2]),

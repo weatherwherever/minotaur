@@ -1,0 +1,8 @@
+.options {
+    display: flex;
+    flex-direction: column;
+}
+
+.options canvas {
+    align-self: center;
+}

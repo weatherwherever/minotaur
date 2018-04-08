@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+<link rel="stylesheet" href="index.css">
 <style type="text/css">
     canvas { background: blue; }
 </style>
@@ -89,17 +90,19 @@ main()
 
 
 <body>
-<canvas id="gl-canvas" width="1500" height="800">
+<canvas id="gl-canvas" width="1500" height="700">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
-<div>Getur farið í gegnum veggi:</div>
-<div id="weapons"> </div>
-<div id="timer"> </div>
-<div>Senda minotaur á random stað:</div>
-<div id='sendMinoCount'></div>
-<canvas id="minimap" width="300" height="300">
-    Oops ... your browser doesn't support the HTML5 canvas element
-    </canvas>
+<div class='options'>
+        <div>Getur farið í gegnum veggi:</div>
+        <div id="weapons"> </div>
+        <div id="timer"> </div>
+        <div>Senda minotaur á random stað:</div>
+        <div id='sendMinoCount'></div>
+        <canvas id="minimap" width="300" height="300">
+            Oops ... your browser doesn't support the HTML5 canvas element
+        </canvas>
+</div>
 
 <img id = "VeggImage" src = "brick29.jpg" hidden></img>
 <img id = "GolfImage" src = "WoodPlanks.jpg" hidden></img>
