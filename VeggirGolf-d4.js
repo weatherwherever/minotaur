@@ -658,6 +658,19 @@ var render = function() {
     minPosZ += 0.025;
   }
 
+  if (
+    Math.abs(userZPos - minPosZ) < 0.1 &&
+    Math.abs(userXPos - minPosX) < 0.1
+  ) {
+    var canvas = document.getElementById("gl-canvas");
+    canvas.style.display = "none";
+    var win = document.createElement("h1");
+    win.style.fontSize = "100px";
+    win.textContent = "YOU LOOSE!";
+    var body = document.querySelector("body");
+    body.insertAdjacentElement("afterbegin", win);
+  }
+
   for (let i = 0; i < wallsCollision.length; i++) {
     for (let j = 0; j < wallsCollision[i].length; j++) {
       if (
