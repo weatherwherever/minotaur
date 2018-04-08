@@ -1,31 +1,35 @@
 .options {
-    display: flex;
+  display: flex;
 }
 
 .options canvas {
-    align-self: center;
-    margin-left: 20px;
+  align-self: center;
+  margin-left: 20px;
 }
 
 div {
-    font-size: 1.5em;
+  font-size: 1.5em;
 }
 
 #na {
-    display: flex;
-
+  display: flex;
 }
 
-#na p{
-    margin: 0;
-    margin-left: 20px;
+#na p {
+  margin: 0;
+  margin-left: 20px;
 }
 
 #sa {
-    display: flex;
+  display: flex;
 }
 
 #sa p {
-    margin: 0;
-    margin-left: 20px;
+  margin: 0;
+  margin-left: 20px;
+}
+
+.controls {
+  float: right;
+  font-size: 20px;
 }
