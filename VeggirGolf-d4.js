@@ -263,7 +263,6 @@ window.onload = function init() {
   );
 
   gl_minimap.uniform1i(gl_minimap.getUniformLocation(program, "texture"), 0);
-
   proLoc = gl_minimap.getUniformLocation(program, "projection");
   mvLoc_minimap = gl_minimap.getUniformLocation(program, "modelview");
 
@@ -339,6 +338,45 @@ window.onload = function init() {
     gl.UNSIGNED_BYTE,
     veggImage
   );
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(
+    gl.TEXTURE_2D,
+    gl.TEXTURE_MIN_FILTER,
+    gl.LINEAR_MIPMAP_LINEAR
+  );
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+
+  // Lesa inn og skilgreina mynstur fyrir start
+  var startImage = document.getElementById("startImage");
+  texStart = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texStart);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(
+    gl.TEXTURE_2D,
+    0,
+    gl.RGBA,
+    gl.RGBA,
+    gl.UNSIGNED_BYTE,
+    startImage
+  );
+  gl.generateMipmap(gl.TEXTURE_2D);
+  gl.texParameteri(
+    gl.TEXTURE_2D,
+    gl.TEXTURE_MIN_FILTER,
+    gl.LINEAR_MIPMAP_LINEAR
+  );
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+  gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
+
+  // Lesa inn og skilgreina mynstur fyrir end
+  var endImage = document.getElementById("endImage");
+  texEnd = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texEnd);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, endImage);
   gl.generateMipmap(gl.TEXTURE_2D);
   gl.texParameteri(
     gl.TEXTURE_2D,
@@ -492,6 +530,18 @@ window.onload = function init() {
           z: spaceZ,
           sign: "|"
         });
+      } else if (board[i][j] === "e") {
+        wallRow.push({
+          x: spaceX,
+          z: spaceZ,
+          sign: "e"
+        });
+      } else if (board[i][j] === "s") {
+        wallRow.push({
+          x: spaceX,
+          z: spaceZ,
+          sign: "s"
+        });
       }
       spaceX += 3;
     }
@@ -571,6 +621,24 @@ var render = function() {
           userXPos -= 0.5;
         }
       }
+      if (
+        (wallsCollision[i][j].x + 3 > userXPos &&
+          wallsCollision[i][j].x - 3 < userXPos &&
+          wallsCollision[i][j].z === Math.floor(userZPos) &&
+          wallsCollision[i][j].sign === "e") ||
+        (wallsCollision[i][j].z + 3 > userZPos &&
+          wallsCollision[i][j].z - 3 < userZPos &&
+          wallsCollision[i][j].x === Math.floor(userXPos) &&
+          wallsCollision[i][j].sign === "e")
+      ) {
+        var canvas = document.getElementById("gl-canvas");
+        canvas.style.display = "none";
+        var win = document.createElement("h1");
+        win.style.fontSize = "100px";
+        win.textContent = "YOU WIN!";
+        var body = document.querySelector("body");
+        body.insertAdjacentElement("afterbegin", win);
+      }
     }
   }
 
@@ -648,11 +716,11 @@ var render = function() {
   gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
   gl.drawArrays(gl.TRIANGLES, numVertices, numVertices);
 
-  gl.bindTexture(gl.TEXTURE_2D, texVegg);
   var spaceZ = 0;
   for (let i = 0; i < board.length; i++) {
     var spaceX = 0;
     for (let j = 0; j < board[i].length; j++) {
+      gl.bindTexture(gl.TEXTURE_2D, texVegg);
       if (board[i][j] === "-") {
         /* main leikur */
         mv = mv1;
@@ -677,6 +745,20 @@ var render = function() {
         mv = mult(mv, rotateY(90.0));
         gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
         gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
+      } else if (board[i][j] === "s") {
+        gl.bindTexture(gl.TEXTURE_2D, texStart);
+        /* main leikur */
+        mv = mv1;
+        mv = mult(mv, translate(spaceX, 0.0, spaceZ));
+        gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
+        gl.drawArrays(gl.TRIANGLES, 0, numVertices);
+      } else if (board[i][j] === "e") {
+        gl.bindTexture(gl.TEXTURE_2D, texEnd);
+        /* main leikur */
+        mv = mv1;
+        mv = mult(mv, translate(spaceX, 0.0, spaceZ));
+        gl.uniformMatrix4fv(mvLoc, false, flatten(mv));
+        gl.drawArrays(gl.TRIANGLES, 0, numVertices);
       }
       spaceX += 3;
     }
