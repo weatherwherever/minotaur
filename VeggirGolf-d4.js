@@ -636,19 +636,19 @@ var render = function() {
   }
 
   if (userXPos < minPosX) {
-    minPosX -= 0.025;
+    minPosX -= 0.035;
   }
 
   if (userXPos > minPosX) {
-    minPosX += 0.025;
+    minPosX += 0.035;
   }
 
   if (userZPos < minPosZ) {
-    minPosZ -= 0.025;
+    minPosZ -= 0.035;
   }
 
   if (userZPos > minPosZ) {
-    minPosZ += 0.025;
+    minPosZ += 0.035;
   }
 
   if (
