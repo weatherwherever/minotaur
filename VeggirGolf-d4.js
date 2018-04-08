@@ -29,14 +29,11 @@ var userZPos = 6.0; //   in (x, z) coordinates, y is fixed
 var userprevX = 3.0;
 var userprevZ = 6.0;
 
-
-
 var userIncr = 0.05; // Size of forward/backward step
 
 var userAngle = 270.0; // Direction of the user in degrees
 var userXDir = 0.0; // X-coordinate of heading
 var userZDir = -1.0; // Z-coordinate of heading
-
 
 var keyCodeMap = {}; // You could also use an array
 
@@ -50,7 +47,7 @@ var proLoc;
 var mvLoc;
 
 var mvLoc_minimap;
-
+var gameover = false;
 var wallHack = {
   count: 1,
   duration: 1000000000000000,
@@ -127,9 +124,9 @@ var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0);
 var lightDiffuse = vec4(1.0, 1.0, 1.0, 1.0);
 var lightSpecular = vec4(1.0, 1.0, 1.0, 1.0);
 
-var materialAmbient = vec4( 0.4, 0.4, 0.4, 1.0 );
-var materialDiffuse = vec4( 0.3, 0.1, 0.5, 1.0 );
-var materialSpecular = vec4( 0.7, 0.7, 1.0, 1.0 );
+var materialAmbient = vec4(0.4, 0.4, 0.4, 1.0);
+var materialDiffuse = vec4(0.3, 0.1, 0.5, 1.0);
+var materialSpecular = vec4(0.7, 0.7, 1.0, 1.0);
 
 var materialShininess = 15;
 
@@ -463,12 +460,12 @@ window.onload = function init() {
   );
   gl.uniform1f(gl.getUniformLocation(program, "shininess"), materialShininess);
 
-  onkeydown = onkeyup = function(e){
-        e = e || event; // to deal with IE
-        keyCodeMap[e.keyCode] = e.type == 'keydown';
-        /* insert conditional here */
-    }
-  
+  onkeydown = onkeyup = function(e) {
+    e = e || event; // to deal with IE
+    keyCodeMap[e.keyCode] = e.type == "keydown";
+    /* insert conditional here */
+  };
+
   //event listeners for mouse
   canvas.addEventListener("mousedown", function(e) {
     movement = true;
@@ -488,7 +485,6 @@ window.onload = function init() {
       origX = e.clientX;
     }
   });
-       
 
   // Event listener for keyboard
   window.addEventListener("keydown", function(e) {
@@ -645,7 +641,9 @@ var render = function() {
           wallsCollision[i][j].x === Math.floor(userXPos) &&
           wallsCollision[i][j].sign === "e")
       ) {
-        var canvas = document.getElementById("gl-canvas").remove();
+        var canvas = document.getElementById("gl-canvas");
+        gameover = true;
+
         var win = document.createElement("h1");
         win.style.fontSize = "100px";
         win.textContent = "YOU WIN!";
@@ -675,7 +673,8 @@ var render = function() {
     Math.abs(userZPos - minPosZ) < 0.1 &&
     Math.abs(userXPos - minPosX) < 0.1
   ) {
-    var canvas = document.getElementById("gl-canvas").remove();
+    var canvas = document.getElementById("gl-canvas");
+    gameover = true;
     var win = document.createElement("h1");
     win.style.fontSize = "100px";
     win.textContent = "YOU LOOSE!";
@@ -696,7 +695,6 @@ var render = function() {
         } else {
           minPosX += 0.1;
         }
-
       }
 
       if (
@@ -793,19 +791,27 @@ var render = function() {
     spaceZ += 3;
   }
 
-  mv = lookAt(vec3(userXPos, 50, userZPos), vec3(userXPos + userXDir, 1, userZPos + userZDir), vec3(0.0, 1.0, 0.0));;
-    mv = mult(mv, translate(Math.floor(userXPos), 0.0, Math.floor(userZPos)));
-    mv = mult(mv, rotateY(45.0));
-    mv = mult(mv, scalem(10,10,10));
-    gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
-    gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
+  mv = lookAt(
+    vec3(userXPos, 50, userZPos),
+    vec3(userXPos + userXDir, 1, userZPos + userZDir),
+    vec3(0.0, 1.0, 0.0)
+  );
+  mv = mult(mv, translate(Math.floor(userXPos), 0.0, Math.floor(userZPos)));
+  mv = mult(mv, rotateY(45.0));
+  mv = mult(mv, scalem(10, 10, 10));
+  gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
+  gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
 
-    mv = lookAt(vec3(userXPos, 50, userZPos), vec3(userXPos + userXDir, 1, userZPos + userZDir), vec3(0.0, 1.0, 0.0));;
-    mv = mult(mv, translate(Math.floor(userXPos), 2, Math.floor(userZPos)));
-    mv = mult(mv, rotateY(-45.0));
-    mv = mult(mv, scalem(10,10,10));
-    gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
-    gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
+  mv = lookAt(
+    vec3(userXPos, 50, userZPos),
+    vec3(userXPos + userXDir, 1, userZPos + userZDir),
+    vec3(0.0, 1.0, 0.0)
+  );
+  mv = mult(mv, translate(Math.floor(userXPos), 2, Math.floor(userZPos)));
+  mv = mult(mv, rotateY(-45.0));
+  mv = mult(mv, scalem(10, 10, 10));
+  gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
+  gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
 
   gl.bindBuffer(gl.ARRAY_BUFFER, null);
   gl.deleteBuffer(tBuffer);
@@ -847,33 +853,33 @@ var render = function() {
   minPrevX = minPosX;
   minPrevZ = minPosZ;
   yay();
-  requestAnimFrame(render);
+  if (!gameover) {
+    requestAnimFrame(render);
+  }
 };
 
-
 function yay() {
-    if(keyCodeMap[87]) {
-        userXPos += userIncr * userXDir;
-        userZPos += userIncr * userZDir;
-        direction = 'forward';
-    }
+  if (keyCodeMap[87]) {
+    userXPos += userIncr * userXDir;
+    userZPos += userIncr * userZDir;
+    direction = "forward";
+  }
 
-    if(keyCodeMap[83]) {
-        userXPos -= userIncr * userXDir;
-            userZPos -= userIncr * userZDir;
-            direction = 'back';
-    }
+  if (keyCodeMap[83]) {
+    userXPos -= userIncr * userXDir;
+    userZPos -= userIncr * userZDir;
+    direction = "back";
+  }
 
-    if(keyCodeMap[65]) {
-        userXPos += userIncr * userZDir;
-            userZPos -= userIncr * userXDir;
-            direction = 'left';
-    }
+  if (keyCodeMap[65]) {
+    userXPos += userIncr * userZDir;
+    userZPos -= userIncr * userXDir;
+    direction = "left";
+  }
 
-    if(keyCodeMap[68]) {
-        userXPos -= userIncr * userZDir;
-            userZPos += userIncr * userXDir;
-            direction = 'right';
-    }
+  if (keyCodeMap[68]) {
+    userXPos -= userIncr * userZDir;
+    userZPos += userIncr * userXDir;
+    direction = "right";
+  }
 }
-
