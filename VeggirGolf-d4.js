@@ -29,7 +29,7 @@ var userZPos = 6.0; //   in (x, z) coordinates, y is fixed
 var userprevX = 3.0;
 var userprevZ = 6.0;
 
-var userIncr = 0.05; // Size of forward/backward step
+var userIncr = 0.04; // Size of forward/backward step
 
 var userAngle = 270.0; // Direction of the user in degrees
 var userXDir = 0.0; // X-coordinate of heading
