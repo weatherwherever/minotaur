@@ -490,7 +490,7 @@ window.onload = function init() {
   window.addEventListener("keydown", function(e) {
     switch (e.keyCode) {
       case 90: // z
-        if (wallHack.count > 0) {
+        if (wallHack.count > 0 && wallHack.active === false) {
           wallHack.active = !wallHack.active;
           wallHack.start = Date.now();
         }
