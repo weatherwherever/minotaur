@@ -118,9 +118,9 @@ var lightAmbient = vec4(1.0, 1.0, 1.0, 1.0 );
 var lightDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
 var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 
-var materialAmbient = vec4( 0.2, 0.0, 0.2, 1.0 );
-var materialDiffuse = vec4( 1.0, 0.8, 0.0, 1.0 );
-var materialSpecular = vec4( 1.0, 1, 1.0, 1.0 );
+var materialAmbient = vec4( 0.4, 0.4, 0.4, 1.0 );
+var materialDiffuse = vec4( 0.3, 0.1, 0.5, 1.0 );
+var materialSpecular = vec4( 0.7, 0.7, 1.0, 1.0 );
 var materialShininess = 15;
 
 var ambientColor, diffuseColor, specularColor;
@@ -510,8 +510,22 @@ var render = function () {
         spaceX = 0;
         spaceZ += 3;
 
-
     }
+
+    console.info(userXPos);
+    mv = lookAt(vec3(userXPos, 50, userZPos), vec3(userXPos + userXDir, 1, userZPos + userZDir), vec3(0.0, 1.0, 0.0));;
+    mv = mult(mv, translate(Math.floor(userXPos), 0.0, Math.floor(userZPos)));
+    mv = mult(mv, rotateY(45.0));
+    mv = mult(mv, scalem(10,10,10));
+    gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
+    gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
+
+    mv = lookAt(vec3(userXPos, 50, userZPos), vec3(userXPos + userXDir, 1, userZPos + userZDir), vec3(0.0, 1.0, 0.0));;
+    mv = mult(mv, translate(Math.floor(userXPos), 2, Math.floor(userZPos)));
+    mv = mult(mv, rotateY(-45.0));
+    mv = mult(mv, scalem(10,10,10));
+    gl_minimap.uniformMatrix4fv(mvLoc_minimap, false, flatten(mv));
+    gl_minimap.drawArrays(gl.TRIANGLES, 0, numVertices);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, null);
     gl.deleteBuffer(tBuffer);
