@@ -631,8 +631,7 @@ var render = function() {
           wallsCollision[i][j].x === Math.floor(userXPos) &&
           wallsCollision[i][j].sign === "e")
       ) {
-        var canvas = document.getElementById("gl-canvas");
-        canvas.style.display = "none";
+        var canvas = document.getElementById("gl-canvas").remove();
         var win = document.createElement("h1");
         win.style.fontSize = "100px";
         win.textContent = "YOU WIN!";
@@ -662,8 +661,7 @@ var render = function() {
     Math.abs(userZPos - minPosZ) < 0.1 &&
     Math.abs(userXPos - minPosX) < 0.1
   ) {
-    var canvas = document.getElementById("gl-canvas");
-    canvas.style.display = "none";
+    var canvas = document.getElementById("gl-canvas").remove();
     var win = document.createElement("h1");
     win.style.fontSize = "100px";
     win.textContent = "YOU LOOSE!";
