@@ -31,11 +31,13 @@ var userprevX = 3.0;
 var userprevZ = 6.0;
 
 
-var userIncr = 0.1; // Size of forward/backward step
+var userIncr = 0.05; // Size of forward/backward step
 var userAngle = 270.0; // Direction of the user in degrees
 var userXDir = 0.0; // X-coordinate of heading
 var userZDir = -1.0; // Z-coordinate of heading
 
+
+var keyCodeMap = {}; // You could also use an array
 
 var movement = false;
 var spinX = 0;
@@ -324,6 +326,13 @@ window.onload = function init() {
     gl.uniform1f( gl.getUniformLocation(program, "shininess"), materialShininess );
 
 
+    onkeydown = onkeyup = function(e){
+        e = e || event; // to deal with IE
+        keyCodeMap[e.keyCode] = e.type == 'keydown';
+        /* insert conditional here */
+    }
+
+
     //event listeners for mouse
     canvas.addEventListener("mousedown", function (e) {
         movement = true;
@@ -343,35 +352,6 @@ window.onload = function init() {
             origX = e.clientX;
         }
     });
-
-    // Event listener for keyboard
-    window.addEventListener("keydown", function (e) {
-
-        switch (e.keyCode) {
-            case 87: // w
-                userXPos += userIncr * userXDir;
-                userZPos += userIncr * userZDir;
-                direction = 'forward';
-                break;
-            case 83: // s
-                userXPos -= userIncr * userXDir;
-                userZPos -= userIncr * userZDir;
-                direction = 'back';
-                break;
-            case 65: // a
-                userXPos += userIncr * userZDir;
-                userZPos -= userIncr * userXDir;
-                direction = 'left';
-                break;
-            case 68: // d
-                userXPos -= userIncr * userZDir;
-                userZPos += userIncr * userXDir;
-                direction = 'right';
-                break;
-        }
-
-    });
-
     
 
     var spaceZ = 0;
@@ -560,5 +540,32 @@ var render = function () {
 
     userprevX = userXPos;
     userprevZ = userZPos;
+    yay();
     requestAnimFrame(render);
+}
+
+function yay() {
+    if(keyCodeMap[87]) {
+        userXPos += userIncr * userXDir;
+        userZPos += userIncr * userZDir;
+        direction = 'forward';
+    }
+
+    if(keyCodeMap[83]) {
+        userXPos -= userIncr * userXDir;
+            userZPos -= userIncr * userZDir;
+            direction = 'back';
+    }
+
+    if(keyCodeMap[65]) {
+        userXPos += userIncr * userZDir;
+            userZPos -= userIncr * userXDir;
+            direction = 'left';
+    }
+
+    if(keyCodeMap[68]) {
+        userXPos -= userIncr * userZDir;
+            userZPos += userIncr * userXDir;
+            direction = 'right';
+    }
 }
