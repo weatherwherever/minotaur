@@ -22,7 +22,7 @@ uniform mat4 modelview;
 uniform vec4 lightPosition;
 uniform mat3 normalMatrix;
 
-void main() 
+void main()
 {
     vec3 pos = (modelview * vPosition).xyz;
 
@@ -35,7 +35,7 @@ void main()
     fTexCoord = vTexCoord;
     fColor = a_color;
     gl_Position = projection * modelview * vPosition;
-} 
+}
 </script>
 
 <script id="fragment-shader" type="x-shader/x-fragment">
@@ -92,6 +92,11 @@ main()
 <canvas id="gl-canvas" width="1500" height="800">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
+<div>Getur farið í gegnum veggi:</div>
+<div id="weapons"> </div>
+<div id="timer"> </div>
+<div>Senda minotaur á random stað:</div>
+<div id='sendMinoCount'></div>
 <canvas id="minimap" width="300" height="300">
     Oops ... your browser doesn't support the HTML5 canvas element
     </canvas>
@@ -99,5 +104,7 @@ Oops ... your browser doesn't support the HTML5 canvas element
 <img id = "VeggImage" src = "brick29.jpg" hidden></img>
 <img id = "GolfImage" src = "WoodPlanks.jpg" hidden></img>
 <img id = "LoftImage" src = "cloud07.jpg" hidden></img>
+<img id = "startImage" src = "start.jpg" hidden></img>
+<img id = "endImage" src = "end.png" hidden></img>
 </body>
 </html>
