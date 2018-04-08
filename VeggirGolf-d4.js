@@ -53,7 +53,7 @@ var wallHack = {
   duration: 5000,
   active: false
 };
-var minoRandomCount = 5;
+var minoRandomCount = 2;
 
 /* board */
 var board;
@@ -137,9 +137,9 @@ var modelViewMatrixLoc, projectionMatrixLoc;
 
 /* min movement */
 
-var minPosX = Math.floor(Math.random() * 30) + 0;
-var minPosY = 1;
-var minPosZ = Math.floor(Math.random() * 30) + 0;
+var minPosX = Math.floor(Math.random() * 30) + 20;
+var minPosY = 0.5;
+var minPosZ = Math.floor(Math.random() * 15) + 10;
 
 var minPrevX;
 var minPrevZ;
@@ -498,8 +498,8 @@ window.onload = function init() {
       case 88: // x
         if (minoRandomCount > 0) {
           minoRandomCount--;
-          minPosX = Math.floor(Math.random() * 30) + 0;
-          minPosZ = Math.floor(Math.random() * 30) + 0;
+          minPosX = Math.floor(Math.random() * 30) + 20;
+          minPosZ = Math.floor(Math.random() * 15) + 10;
         }
         break;
     }
@@ -817,7 +817,7 @@ var render = function() {
 
   modelViewMatrix = mult(modelViewMatrix, translate(minPosX, minPosY, minPosZ));
   modelViewMatrix = mult(modelViewMatrix, rotateX(0));
-  modelViewMatrix = mult(modelViewMatrix, scalem(1, 1, 1));
+  modelViewMatrix = mult(modelViewMatrix, scalem(0.5, 0.5, 0.5));
 
   gl.uniformMatrix4fv(mvLoc, false, flatten(modelViewMatrix));
   gl.uniformMatrix3fv(normalLoc, false, flatten(normalMatrix));

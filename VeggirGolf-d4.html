@@ -74,10 +74,9 @@ main()
 
     fColor = ambient + diffuse + specular;
     fColor.a = 1.0;
-    // viðbætt
 
     gl_FragColor = texture2D( texture, fTexCoord ) + fColor;
-    
+
 }
 </script>
 
@@ -90,7 +89,7 @@ main()
 
 
 <body>
-<canvas id="gl-canvas" width="1500" height="700">
+<canvas id="gl-canvas" width="1300" height="600">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 <div class='options'>
@@ -98,13 +97,13 @@ Oops ... your browser doesn't support the HTML5 canvas element
             <div id='sa' >Getur farið í gegnum veggi:
                     <p id="weapons"> </p>
             </div>
-            
+
             <div id="timer"> </div>
             <div id ='na'>Senda minotaur á random stað:
                 <p id='sendMinoCount'></p>
             </div>
     </div>
-        
+
     <canvas id="minimap" width="500" height="300">
             Oops ... your browser doesn't support the HTML5 canvas element
     </canvas>
