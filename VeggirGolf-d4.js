@@ -489,37 +489,19 @@ window.onload = function init() {
   // Event listener for keyboard
   window.addEventListener("keydown", function(e) {
     switch (e.keyCode) {
-      case 87: // w
-        userXPos += userIncr * userXDir;
-        userZPos += userIncr * userZDir;
-        direction = "forward";
-        break;
-      case 83: // s
-        userXPos -= userIncr * userXDir;
-        userZPos -= userIncr * userZDir;
-        direction = "back";
-        break;
-      case 65: // a
-        userXPos += userIncr * userZDir;
-        userZPos -= userIncr * userXDir;
-        direction = "left";
-        break;
-      case 68: // d
-        userXPos -= userIncr * userZDir;
-        userZPos += userIncr * userXDir;
-        direction = "right";
-        break;
       case 90: // z
         if (wallHack.count > 0) {
           wallHack.active = !wallHack.active;
           wallHack.start = Date.now();
         }
+        break;
       case 88: // x
         if (minoRandomCount > 0) {
           minoRandomCount--;
           minPosX = Math.floor(Math.random() * 30) + 0;
           minPosZ = Math.floor(Math.random() * 30) + 0;
         }
+        break;
     }
   });
 
